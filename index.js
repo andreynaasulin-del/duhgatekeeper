@@ -24,10 +24,13 @@ http.createServer((req, res) => {
 
 console.log('Gatekeeper Bot запустился и ждет заявок...');
 
+const ADMIN_ID = 7984904430;
+
 // Слушаем запросы на вступление (Join Request)
 bot.on('chat_join_request', async (ctx) => {
     const userId = ctx.chatJoinRequest.from.id;
-    const userFirstName = ctx.chatJoinRequest.from.first_name;
+    const userFirstName = ctx.chatJoinRequest.from.first_name || 'Незнакомец';
+    const userUsername = ctx.chatJoinRequest.from.username ? `@${ctx.chatJoinRequest.from.username}` : 'нет юзернейма';
     const privateChannelId = ctx.chatJoinRequest.chat.id;
 
     try {
@@ -42,17 +45,29 @@ bot.on('chat_join_request', async (ctx) => {
             await ctx.approveChatJoinRequest(privateChannelId, userId);
             console.log(`✅ [ОДОБРЕН] ${userFirstName} (${userId}) подписан на основу.`);
 
-            // Опционально: Можно отправить сообщение в личку (если юзер запускал бота раньше)
-            // await ctx.telegram.sendMessage(userId, 'Доступ открыт. Добро пожаловать в цех.');
         } else {
-            // Если НЕ подписан - ИГНОРИРУЕМ (пусть висит в заявках) 
+            // Если НЕ подписан - ИГНОРИРУЕМ
             console.log(`❌ [ИГНОР] ${userFirstName} (${userId}) НЕ подписан на основу.`);
 
-            // Попытка отправить сообщение с просьбой подписаться
+            // 1. Пишем юзеру
             try {
                 await ctx.telegram.sendMessage(userId, `🛑 <b>Доступ закрыт!</b>\n\nЧтобы я автоматически одобрил твою заявку, ты должен быть подписан на основной канал: ${PUBLIC_CHANNEL}\n\n👉 <b>Подпишись и подай заявку снова!</b>`, { parse_mode: 'HTML' });
             } catch (err) {
-                console.log(`⚠️ Не удалось написать юзеру в ЛС (он не спикал бота): ${err.message}`);
+                console.log(`⚠️ Не удалось написать юзеру в ЛС: ${err.message}`);
+            }
+
+            // 2. СТУЧИМ АДМИНУ
+            try {
+                await ctx.telegram.sendMessage(ADMIN_ID,
+                    `⚠️ <b>Попытка входа без подписки!</b>\n\n` +
+                    `👤 <b>Имя:</b> ${userFirstName}\n` +
+                    `🔗 <b>Link:</b> ${userUsername}\n` +
+                    `🆔 <b>ID:</b> <code>${userId}</code>\n\n` +
+                    `⚡️ <a href="tg://user?id=${userId}">НАПИСАТЬ ЕМУ В ЛС</a>`,
+                    { parse_mode: 'HTML' }
+                );
+            } catch (err) {
+                console.error('Не удалось отправить отчет админу:', err);
             }
         }
 
