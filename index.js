@@ -4,7 +4,14 @@ const http = require('http');
 
 // Токен и канал берутся из .env файла
 const bot = new Telegraf(process.env.BOT_TOKEN);
-const PUBLIC_CHANNEL = process.env.PUBLIC_CHANNEL || '@bigstepacoding';
+let PUBLIC_CHANNEL = process.env.PUBLIC_CHANNEL || '@duhdeveloperhub';
+
+// Автоматически добавляем @, если его нет (защита от дурака)
+if (!PUBLIC_CHANNEL.startsWith('@')) {
+    console.log(`⚠️ Добавляю отсутствующий @ к ${PUBLIC_CHANNEL}`);
+    PUBLIC_CHANNEL = '@' + PUBLIC_CHANNEL;
+}
+console.log('Целевой канал:', PUBLIC_CHANNEL);
 
 // Health-check сервер для Render (чтобы не ругался на отсутствие порта)
 const PORT = process.env.PORT || 3000;
