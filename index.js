@@ -48,7 +48,13 @@ bot.on('chat_join_request', async (ctx) => {
     }
 });
 
-bot.launch();
+bot.launch({
+    dropPendingUpdates: true
+}).then(() => {
+    console.log('✅ Бот успешно подключен к Telegram!');
+}).catch((err) => {
+    console.error('❌ Ошибка запуска бота:', err.message);
+});
 
 // Обработка мягкой остановки
 process.once('SIGINT', () => bot.stop('SIGINT'));
