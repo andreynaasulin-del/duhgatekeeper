@@ -1,0 +1,21 @@
+{
+  "name": "duh-gatekeeper-bot",
+  "version": "1.0.0",
+  "description": "Telegram Gatekeeper Bot - автоматическое одобрение заявок на вступление",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "gatekeeper"
+  ],
+  "author": "DUH Developer",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "telegraf": "^4.16.3"
+  }
+}
