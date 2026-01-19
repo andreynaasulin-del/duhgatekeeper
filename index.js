@@ -1,9 +1,19 @@
 require('dotenv').config();
 const { Telegraf } = require('telegraf');
+const http = require('http');
 
 // Токен и канал берутся из .env файла
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const PUBLIC_CHANNEL = process.env.PUBLIC_CHANNEL || '@bigstepacoding';
+
+// Health-check сервер для Render (чтобы не ругался на отсутствие порта)
+const PORT = process.env.PORT || 3000;
+http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Gatekeeper Bot is running!');
+}).listen(PORT, () => {
+    console.log(`Health-check сервер запущен на порту ${PORT}`);
+});
 
 console.log('Gatekeeper Bot запустился и ждет заявок...');
 
